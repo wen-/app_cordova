@@ -1,0 +1,135 @@
+﻿{
+	"README": "Please use JSON Validator after each change this file. It will help to find errors.",
+	"JSON_VALIDATOR_URL": "http://jsonlint.com/",
+
+	"en": {
+        "pause": "PAUSE",
+        "no_moves": "NO POSSIBLE\nMOVES!",
+        "game_over": "Game Over",
+		"continue_hint": "Buy boosters\nand try again!",
+		"victory": "Victory!",
+		"stone": "You have crafted\nInfinity Orb!",
+
+		"boosters_title": "Boosters",
+		"coins_warning": "Not enough coins!",
+		"maxed_warning": "You can't buy more!",
+
+		"items": [
+			"Clover",
+			"Mushroom",
+			"Skull",
+			"Runic Stone",
+			"Caldron",
+			"Potion",
+			"Wizard Hat",
+			"Scroll",
+			"Spellbook",
+			"Chest",
+			"Diamond",
+			"Medallion",
+			"Sphere"
+		],
+
+		"tutorial": [
+			"Hello my friend!",
+			"I want to create\nan ancient powerful artifact.",
+			"Let's use alchemy for it.",
+			"Combine 3 or more elements\nto create a new one.",
+			"Magnificent!",
+			"But you can do better.\nUndo last action!",
+			"Very good!",
+			"I've a gift for you!\nTake a look!",
+			"Try it!",
+			"Now you are ready!",
+			"Combine simple items\ninto advanced ones...",
+			"To achieve that\nMYSTERIOUS ARTIFACT!"
+		],
+
+		"boosters": {
+			"Remove": {
+				"title": "-1 Element",
+				"description": "Removes any item",
+				"hint": "Tap any item to remove it"
+			},
+			"Magnet": {
+				"title": "Magnet",
+				"description": "Convert all items\ninto advanced",
+				"hint": "Tap any item to combine\nall items same type"
+			},
+			"Sort": {
+				"title": "Sorter",
+				"description": "Sort all elements\non board.",
+				"hint": "Tap any item\nto sort all items"
+			},
+			"Extra_Undo": {
+				"title": "Extra Undo",
+				"description": "Gives extra undo."
+			}
+		}
+	},
+	
+	"ru": {
+		"pause": "ПАУЗА",
+		"no_moves": "Больше ходовт\nнет!",
+		"game_over": "Проиграл",
+		"victory": "Победа!",
+		"stone": "Вы сотворили Сферу Бесконесности!",
+
+		"boosters_title": "Бустеры",
+		"coins_warning": "Не хватает монет!",
+		"maxed_warning": "Больше купить нельзя!",
+
+		"items": [
+			"Clover",
+			"Mushroom",
+			"Skull",
+			"Runic Stone",
+			"Caldron",
+			"Potion",
+			"Wizard Hat",
+			"Scroll",
+			"Spellbook",
+			"Chest",
+			"Diamond",
+			"Medallion",
+			"Sphere"
+		],
+
+		"tutorial": [
+			"Здравствуй, мой друг!",
+			"Я хочу создать\nдревний артефакт.",
+			"Поможешь мне?",
+			"Выдели 3 элемента,\nчтобы создать новый.",
+			"Великолепно!",
+			"Но можно и лучше.\nОтмени последний ход!",
+			"Очень хорошо!",
+			"У меня есть подарок\nдля тебя. Взгляни!",
+			"Попробуй его!",
+			"Ты почти готов.",
+			"Превращай простые\nэлементы в более сложные...",
+			"Для того, чтобы изготовить\nэтот СУПЕР АРЕТФАКТ!"
+		],
+
+		"boosters": {
+			"Remove": {
+				"title": "-1 Element",
+				"description": "Removes any item",
+				"hint": "Tap any item to remove it"
+			},
+			"Magnet": {
+				"title": "Magnet",
+				"description": "Convert all items\ninto advanced",
+				"hint": "Tap any item to combine\nall items same type"
+			},
+			"Sort": {
+				"title": "Sorter",
+				"description": "Sort all elements\non board.",
+				"hint": "Tap any item\nto sort all items"
+			},
+			"Extra_Undo": {
+				"title": "Extra Undo",
+				"description": "Gives extra undo."
+			}
+		}
+	}
+}

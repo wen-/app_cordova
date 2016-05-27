@@ -1,0 +1,35 @@
+﻿{"frames": {
+
+"Ray0000":
+{
+	"frame": {"x":1,"y":1,"w":717,"h":120},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":717,"h":120},
+	"sourceSize": {"w":717,"h":120}
+},
+"Sphere0000":
+{
+	"frame": {"x":719,"y":1,"w":254,"h":253},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":254,"h":253},
+	"sourceSize": {"w":254,"h":253}
+},
+"Star_Particle0000":
+{
+	"frame": {"x":1,"y":122,"w":62,"h":62},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":62,"h":62},
+	"sourceSize": {"w":62,"h":62}
+}},
+"meta": {
+	"app": "Adobe Flash Professional",
+	"version": "13.0.1.808",
+	"image": "game_complete.png",
+	"format": "RGBA8888",
+	"size": {"w":1024,"h":1024},
+	"scale": "1"
+}
+}

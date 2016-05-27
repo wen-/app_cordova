@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline';script-src 'self' http://192.168.20.198:* 'unsafe-inline' 'unsafe-eval';connect-src 'self' http://192.168.20.198:*; media-src *;font-src *">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">
+<meta name="format-detection" content="telephone=no">
+<meta name="HandheldFriendly" content="true" />
+<meta name="robots" content="noindex,nofollow" />
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="Salazar">
+<title>打地鼠</title>
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" src="js/phaser.min.js"></script>
+</head>
+<body>
+
+<div id="susliks" class="susliks"></div>
+<script>
+
+var game = new Phaser.Game(300, 300, Phaser.AUTO, 'susliks', { preload: preload, create: create, update: update });
+
+function preload() {
+
+    game.load.bitmapFont('num0', 'number/num0_0.png', 'number/num0.fnt');
+    game.load.bitmapFont('num1', 'number/num1_0.png', 'number/num1.fnt');
+
+}
+
+var bpmText;
+
+function create() {
+
+    bmpText = game.add.bitmapText(50, 50, 'num0', '0', 20);
+
+}
+
+function update() {
+
+    //bmpText.text = Math.round(game.time.now);
+
+}
+</script>
+</body>
+</html>

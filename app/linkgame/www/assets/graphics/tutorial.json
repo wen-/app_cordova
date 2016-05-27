@@ -1,0 +1,43 @@
+﻿{"frames": {
+
+"Grid_Overlay0000":
+{
+	"frame": {"x":1,"y":1,"w":250,"h":310},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":250,"h":310},
+	"sourceSize": {"w":250,"h":310}
+},
+"Hand0000":
+{
+	"frame": {"x":398,"y":1,"w":79,"h":106},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":79,"h":106},
+	"sourceSize": {"w":79,"h":106}
+},
+"TutorText_Back0000":
+{
+	"frame": {"x":1,"y":312,"w":500,"h":50},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":500,"h":50},
+	"sourceSize": {"w":500,"h":50}
+},
+"Wizard_Head0000":
+{
+	"frame": {"x":252,"y":1,"w":145,"h":222},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":145,"h":222},
+	"sourceSize": {"w":145,"h":222}
+}},
+"meta": {
+	"app": "Adobe Flash Professional",
+	"version": "13.0.1.808",
+	"image": "tutorial.png",
+	"format": "RGBA8888",
+	"size": {"w":512,"h":512},
+	"scale": "1"
+}
+}

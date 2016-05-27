@@ -1,0 +1,18 @@
+{
+     "android": {
+         "debug": {
+             "keystore": "mouse-key.keystore",
+             "storePassword": "123456",
+             "alias": "mouse",
+             "password" : "123456",
+             "keystoreType": ""
+         },
+         "release": {
+             "keystore": "mouse-key.keystore",
+             "storePassword": "123456",
+             "alias": "mouse",
+             "password" : "123456",
+             "keystoreType": ""
+         }
+     }
+ }

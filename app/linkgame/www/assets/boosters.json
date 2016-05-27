@@ -1,0 +1,21 @@
+﻿{
+	"Remove": {
+		"price": 200,
+		"max": 9
+	},
+
+	"Magnet": {
+		"price": 400,
+		"max": 9
+	},
+
+	"Sort": {
+		"price": 800,
+		"max": 9
+	},
+
+	"Extra_Undo": {
+		"price": 1000,
+		"max": 3
+	}
+}

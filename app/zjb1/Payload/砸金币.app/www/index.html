@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline';script-src 'self' http://192.168.20.198:* 'unsafe-inline' 'unsafe-eval';connect-src 'self' http://192.168.20.198:*; media-src *;font-src *">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-tap-highlight" content="no">
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+<title>砸金币游戏</title>
+<style type="text/css">
+*{margin:0;padding:0;}
+html,body,.susliks {
+    height:100%;
+	width:100%;
+	overflow:hidden;
+}
+@font-face {
+    font-family: 'GrilledCheeseBTNToasted';
+    src: local('GrilledCheeseBTNToasted'), url('fonts/GrilledCheeseBTNToasted.woff') format('woff');
+    font-style: normal;
+    font-weight: normal;
+}
+</style>
+</head>
+<body>
+
+<div id="susliks" class="susliks"></div>
+
+<script src="http://192.168.20.198:8081/target/target-script-min.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/phaser.min.js"></script>
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript">
+$(function(){
+	document.addEventListener('deviceready', onDeviceReady, false);
+	
+	function onDeviceReady(){
+		console.log("deviceready加载完成");
+		var game_music_src = getMediaURL("audio/game_music.mp3");
+		var over_music_src = getMediaURL("audio/over_music.mp3");
+		var bom_music_src = getMediaURL("audio/bom_music.mp3");
+		
+		function getMediaURL(s){
+			if(device.platform.toLowerCase() === "android"){ 
+				return "/android_asset/www/" + s;
+			}
+			return s;
+		}
+		
+		var game_music = new Media(game_music_src,
+			// success callback
+			function () {
+				game_music.play();
+			},
+			// error callback
+			function (err) {
+				console.log("Audio Error: " + JSON.stringify(err));
+			}
+		);
+		game_music.play();
+		
+		
+		var qqbrowser = window.navigator.appVersion.toLowerCase().indexOf("mqqbrowser")>-1;
+		var platform = (window.navigator.platform).toLowerCase();
+		var gametime = false;
+		var game = {},game_music;
+		var _config = {};
+		_config.win_w = window.innerWidth;
+		_config.win_h = window.innerHeight;
+		_config.SOURCE_GAME_WIDTH = 640;
+		_config.SOURCE_GAME_HEIGHT = 960;
+		_config.GAME_WIDTH = _config.SOURCE_GAME_WIDTH;
+		_config.GAME_HEIGHT = _config.SOURCE_GAME_HEIGHT;
+		_config.HALF_GAME_WIDTH = _config.GAME_WIDTH*.5;
+		_config.HALF_GAME_HEIGHT = _config.GAME_HEIGHT*.5;
+		_config.WORLD_SCALE = 1;
+		_config.playtime = 20;//秒
+		_config.loop = 12;//百毫秒(金币出现间隔时间)
+		_config.loop = gametime?_config.loop:parseInt(_config.loop*.8);
+		_config.loopn = 5;//个(如果有奖间隔多少个绑定)
+		_config.turn = 10;//金币转动速度
+		_config.gravityY = 300;//金币掉落速度（越大越快）
+		_config.gravityY = gametime?_config.gravityY:_config.gravityY*1.5;
+		_config.speed_m = true;
+		_config.speed_l = true;
+		_config.n = 0;
+		_config.m = 0;
+		_config.killtxt = 0;//点中金币数
+		_config.moneytxt = 0;//获得现金数
+		_config.cache = function(){
+			function a(){
+				this._enabled = true;
+				this.init();
+			}
+			return a.prototype.init = function() {
+				try {
+					this.localStorage = window.localStorage;
+					this.localStorage.setItem("testKey", "testData");
+					this.localStorage.removeItem("testKey");
+				} catch(a) {
+					this._enabled = false;
+				}
+			},
+			a.prototype.saveValue = function(a, b) {
+				if (this._enabled) {
+					var c = JSON.stringify(b);
+					this.localStorage.setItem(a, c)
+				}
+			},
+			a.prototype.getValue = function(a) {
+				return this.localStorage.getItem(a)
+			},
+			a.prototype.remove = function(a) {
+				this._enabled && this.localStorage.removeItem(a)
+			},
+			a.prototype.clear = function() {
+				this._enabled && this.localStorage.clear()
+			},a;
+		}();
+		_config.storage = new _config.cache;
+		_config.storageArray = [];
+		_config.storage.clear();
+		
+		_config.gamedata;
+		_config.gamen = 0;
+		_config.gamel = 0;
+		function getdata(){
+			$.ajax({
+				url: "data/game.json",
+				data: {},
+				type: "get",
+				dataType: "json",
+				success: function(obj) {
+					if (obj.status == 200) {
+						_config.gamedata = obj.m;
+						_config.gamel = obj.m.length;
+					}
+				},
+				error: function(ajaxobj) {
+			
+				}
+			});
+		}
+		
+		var game = new Phaser.Game(_config.SOURCE_GAME_WIDTH, _config.SOURCE_GAME_HEIGHT, Phaser.CANVAS, 'susliks', {
+			init:init, 
+			preload: preload, 
+			loadUpdate: loadUpdate,
+			create: create, 
+			update: update, 
+			render: render 
+		});
+		
+		function init(){
+			game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
+			game.scale.aspectRatio = _config.SOURCE_GAME_WIDTH / _config.SOURCE_GAME_HEIGHT;
+			game.scale.setMinMax(170, 240, window.innerWidth, window.innerHeight);
+			game.scale.pageAlignHorizontally = true;
+			game.scale.pageAlignVertically = true;
+		
+		}
+		function sizeChange(){
+			(window.innerHeight > window.innerWidth) ? (scaleGame(),game.state.resize(_config.GAME_WIDTH, _config.GAME_HEIGHT), onEnterPortrait()) : onEnterLandscape();
+		}
+		function scaleGame() {
+			var b = window.innerWidth,
+				c = window.innerHeight,
+				d = b * game.device.pixelRatio,
+				e = 0,
+				f = 0;
+			d <= _config.SOURCE_GAME_WIDTH ? (e = 2 * b, f = 2 * c) : (e = b, f = c);
+			var g = _config.SOURCE_GAME_WIDTH,
+				h = e / g;
+			game.world.scale.set(h, h);
+			game.scale.setGameSize(e, f);
+			_config.WORLD_SCALE = h;
+			_config.GAME_WIDTH = game.canvas.width / h;
+			_config.GAME_HEIGHT = game.canvas.height / h;
+			_config.HALF_GAME_WIDTH = .5 * _config.GAME_WIDTH;
+			_config.HALF_GAME_HEIGHT = .5 * _config.GAME_HEIGHT;
+		}
+		function onEnterLandscape() {
+			
+		};
+		function onEnterPortrait() {
+			
+		};
+		
+		function preload(){
+			game.load.atlasJSONHash("preloader", "images/preloader.png", "images/preloader.json");
+			game.load.spritesheet('startbtn','images/player.png?4',153,217,5);
+			game.load.image("dialog",'images/dialog.png?1');
+			
+			(!gametime)&&game.load.image('training','images/training.png');
+		}
+		
+		function loadUpdate(){
+			
+		}
+		
+		function create(){
+			//背景图
+			bg = game.add.sprite(0, 0, "preloader", "bg.jpg");
+			bg.height = _config.GAME_HEIGHT;
+			bg.width = _config.GAME_WIDTH;
+			
+			backPreloadSprite = game.add.image(0, 0, "preloader", "after.png");
+			backPreloadSprite.anchor.set(.5, .5);
+			
+			backPreloadSprite.x = _config.HALF_GAME_WIDTH;
+			backPreloadSprite.y = _config.HALF_GAME_HEIGHT;
+			
+			frontPreloadSprite = game.add.sprite(0, 0, "preloader", "before.png");
+			frontPreloadSprite.angle = -90;
+			frontPreloadSprite.anchor.set(0,.5);
+			frontPreloadSprite.x = backPreloadSprite.x;
+			frontPreloadSprite.y = backPreloadSprite.y + .5 * frontPreloadSprite.height-5;
+			
+			loadingText = game.add.text(0, 0, "Loading...", {font: "45px GrilledCheeseBTNToasted",fill: "#fff",align: "center"});
+			loadingText.anchor.set(.5, .5);
+			loadingText.position.set(_config.HALF_GAME_WIDTH, _config.HALF_GAME_HEIGHT + 100);
+			loadingText.setShadow(2, 2, "#0C1829");
+		
+			if(!gametime){
+				training_tips = game.add.image(game.world.centerX-20,game.world.centerY+100,"training");
+				training_txt = game.add.text(game.world.centerX-210, game.world.centerY+190, "非活动时间，将进入\n在游戏训练场中，游戏数据将不做记录", {fontSize: "26px",fill: "yellow"});
+				
+			}
+			
+			
+			game.load.onLoadStart.add(loadStart, this);
+			game.load.onFileComplete.add(fileComplete, this);
+			game.load.onLoadComplete.add(loadComplete, this);
+			
+			game.load.enableParallel = false;
+			game.load.onFileError.add(fileError, this);
+			
+			start_load();
+			
+		}
+		function fileError(){
+			console.log("加载出错");
+		}
+		
+		function start_load(){
+			game.load.setPreloadSprite(frontPreloadSprite);
+			
+			game.load.spritesheet('kaboom', 'images/explode.png?1', 100, 96);
+			game.load.image('timeover','images/time_over.png');
+			game.load.atlasJSONHash('anzai', 'images/progress.png?1', "images/progress.json?3");
+			game.load.image('replaybtn','images/replaybtn.png');
+			game.load.image('exitbtn','images/exitbtn.png');
+			//game.load.audio('game_music', ['audio/game_music.ogg','audio/game_music.mp3','audio/game_music.aac']);
+			//game.load.audio('over_music', ['audio/over_music.ogg','audio/over_music.mp3','audio/over_music.aac']);
+			//game.load.audio('bom_music', ['audio/bom_music.ogg','audio/bom_music.mp3','audio/bom_music.aac']);
+			
+			game.load.start();
+		}
+		
+		function loadStart() {
+		
+			loadingText.setText("Loading ...");
+		
+		}
+		
+		function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles) {
+		
+			loadingText.setText(progress + "%");
+		
+		}
+		
+		function loadComplete() {
+			//loadingText.setText("正在解码音频文件...");
+			//游戏声音
+			
+			//game_music = game.add.audio('game_music');
+			//over_music = game.add.audio('over_music');
+			//bom_music = game.add.audio('bom_music');
+			//bom_music.allowMultiple = true;
+			//bom_music.addMarker('bom', 1, 1.0);
+			//game_music.loop = true;
+			//game.sound.setDecodedCallback([ game_music,over_music,bom_music], start_game, this);
+		
+			function start_game(){
+		
+				//game_music.play();
+				game.add.tween(backPreloadSprite).to({alpha: 0},500,Phaser.Easing.Linear.None,true,0,0);
+				game.add.tween(frontPreloadSprite).to({alpha: 0},500,Phaser.Easing.Linear.None,true,0,0);
+				game.add.tween(loadingText).to({alpha: 0},500,Phaser.Easing.Linear.None,true,0,0);
+				playBtn = game.add.sprite(game.world.centerX-100, game.world.height, "startbtn");
+				playBtn.alpha = .2;
+				playBtn.anchor.set(.5, .5);
+				playanim = playBtn.animations.add('run');
+				playanim.play(10, true);
+				playBtn.inputEnabled = true;
+				var tween0 = game.add.tween(playBtn).to({alpha:.7,y:game.world.centerY-300},1500,Phaser.Easing.Bounce.In,false,500,0);
+				tween0.onComplete.addOnce(function(t){
+					var tween1 = game.add.tween(playBtn).to({alpha:1,y:game.world.centerY},300,Phaser.Easing.Linear.None,false,0,0);
+					game.add.tween(playBtn.scale).to({x:1.5,y:1.5},300,Phaser.Easing.Linear.None,true,0,0);
+					tween1.onComplete.addOnce(function(t) {
+						playBtn.events.onInputDown.add(playbtn, this);
+						dialog = game.add.button(game.world.centerX, game.world.centerY-100, "dialog",playbtn,this);
+						var d_p = game.add.tween(dialog).to({alpha:0},1000,Phaser.Easing.Bounce.In,true,500,-1);
+						d_p.yoyo(true,10);
+					},this);
+					tween1.start();
+		
+				},this);
+				tween0.start();
+			}
+			start_game();
+		}
+		function playbtn(){
+			gametime&&getdata();
+			bg.visible = false;
+			bg.destroy();
+			dialog&&(dialog.visible = false);
+			dialog&&dialog.destroy();
+			frontPreloadSprite.destroy();
+			backPreloadSprite.destroy();
+			loadingText.destroy();
+			(!gametime)&&training_tips.destroy();
+			(!gametime)&&training_txt.destroy();
+		
+			play_game();
+			playBtn.destroy();
+		}
+		
+		function help_game(){
+			
+		}
+		
+		function play_game(){
+			//启用物理引擎
+			game.physics.startSystem(Phaser.Physics.ARCADE);
+			//设置重力系统
+			game.physics.arcade.gravity.y = _config.gravityY;
+			
+			//游戏界面
+			show_bg = game.add.image(0, 0, "anzai", "bg.png");
+			show_bg.width = game.world.width;
+			show_bg.height = game.world.height;
+		
+			//训练场
+			if(!gametime){
+				training = game.add.tileSprite(0, 0,game.world.width,game.world.height, 'training');
+				training.alpha = 0.3;
+				training_replay = game.add.button(game.world.centerX-200, game.world.centerY-100, "replaybtn",function(){window.location.reload();},this);
+				training_replay.alpha = 0;
+				training_replay.visible = false;
+				training_exit = game.add.button(game.world.centerX, game.world.centerY-100, "exitbtn",function(){navigator.app.exitApp();},this);
+				training_exit.alpha = 0;
+				training_exit.visible = false;
+			}
+		
+			//添加统计
+			killtxt_bg = game.add.image(10,10,'anzai','numbg.png');
+			killtxt_title = game.add.image(40,20,'anzai','killt.png');
+			killtxt_n = game.add.text(killtxt_title.x+killtxt_title.width+20, 17, "0", {fontSize: "30px",fill: "#fbb040"});
+			killtxt_n.setShadow(2, 2, "#0C1829");
+		
+			moneytxt_bg = game.add.image(game.world.width-10,10,'anzai','numbg.png');
+			moneytxt_bg.anchor.set(1,0);
+			moneytxt_title = game.add.image(moneytxt_bg.x-moneytxt_bg.width+30,20,'anzai','moneyt.png');
+			moneytxt_n = game.add.text(moneytxt_title.x+moneytxt_title.width+20, 17, "0", {fontSize: "30px",fill: "#fbb040"});
+			moneytxt_n.setShadow(2, 2, "#0C1829");
+			
+			//游戏时间倒计时
+			playtime_bg = game.add.image(0,game.world.height,"anzai","timebg.png");
+			playtime_bg.anchor.set(0,1);
+			playtime_bg.width = game.world.width;
+			playtime_progress = game.add.image(game.world.width,game.world.height+1,"anzai","time.png");
+			playtime_progress.width = game.world.width;
+			playtime_progress.angle = 180;
+			playtime_t = game.add.image(10,game.world.height-30,'anzai','timetxt.png');
+		
+			_config.playtime_w = playtime_progress.width;
+			
+			//爆炸组
+			explosions = game.add.group();
+			explosions.createMultiple(30, 'kaboom');
+			explosions.forEach(setupInvader, this);
+			_config.playtime = _config.playtime*10;
+		
+			//游戏时间结束
+			timeover = game.add.image(game.world.centerX,game.world.centerY-200,"timeover");
+			timeover.x = game.world.centerX-timeover.width/2;
+			timeover.visible = false;
+			overtxt = game.add.text(game.world.centerX, game.world.centerY, '正在统计数据...', {fontSize: "30px",fill: "yellow",align: "center"});
+			overtxt.anchor.set(.5,.5);
+			overtxt.alpha = 0;
+			overtxt.visible = false;
+			//隐藏菜单背景
+			//bg_menu.visible = false;
+			//playbtn.visible = false;
+			//playhelp.visible = false;
+			
+			//循环生成金币
+			_config._loop = _config.loop;
+			mouseloop = game.time.events.loop(Phaser.Timer.SECOND/10, updateCounter, this);
+			
+		}
+		
+		function updateCounter(){
+			_config.n++;
+		
+			if(_config.n > _config.playtime*.3&&_config.speed_m){
+				_config._loop = parseInt(_config.loop*.7);
+				game.physics.arcade.gravity.y = parseInt(_config.gravityY+_config.gravityY*1);
+				_config.speed_m = false;
+			}
+			if(_config.n > _config.playtime*.6&&_config.speed_l){
+				_config._loop = parseInt(_config.loop*.4);
+				game.physics.arcade.gravity.y = parseInt(_config.gravityY+_config.gravityY*2);
+				_config.speed_l = false;
+				var tips = game.add.text(game.world.centerX, game.world.centerY, '一大波安仔即将来袭！', {fontSize: "30px",fill: "yellow",align: "center"});
+				tips.anchor.set(.5,.5);
+				tips.alpha = 0;
+				var tipstween = game.add.tween(tips).to({alpha:1},500,Phaser.Easing.Linear.None,false,0,0);
+				tipstween.yoyo(true,2000);
+				tipstween.onComplete.addOnce(function(t){
+					tips.destroy();
+				},this);
+				tipstween.start();
+			}
+		
+			if(_config.n%_config._loop == 0){
+				_config.m++;
+				var gold = game.add.sprite(game.world.randomX, -30, "anzai","az.png");
+				gold.anchor.set(.5,.5);
+				//gold.scale.set(3);
+				var randoxX = game.world.randomX;
+				randoxX = randoxX < gold.width?gold.width:(randoxX > (game.world.width-gold.width)?(game.world.width-gold.width):randoxX);
+				gold.x = randoxX;
+				//console.log(randoxX+'___'+game.world.width);
+				game.physics.enable(gold, Phaser.Physics.ARCADE);
+				if(_config.gamedata&&_config.gamedata.length){
+					//console.log("_config.speed_m====="+_config.speed_m);
+					if(_config.n%(_config._loop*_config.loopn) == 0) {
+						if (_config.speed_m && _config.gamen < parseInt(_config.gamel / 3)) {
+							gold.name = _config.gamedata.shift();
+							_config.gamen++;
+							//console.log(gold.name+"___1"+_config.gamen);
+						}
+						if (!_config.speed_m && _config.speed_l && _config.gamen < parseInt(_config.gamel / 3) * 2) {
+							gold.name = _config.gamedata.shift();
+							_config.gamen++;
+							//console.log(gold.name+"___2"+_config.gamen);
+						}
+						if (!_config.speed_m && !_config.speed_l) {
+							gold.name = _config.gamedata.shift();
+							//console.log(gold.name+"___3"+_config.gamen);
+						}
+					}
+				}
+				gold.outOfBoundsKill = true;
+				gold.checkWorldBounds = true;
+		
+				gold.inputEnabled = true;
+				gold.events.onInputDown.add(kill, this);
+		
+				//var goldplay = gold.animations.add('walk');
+				//goldplay.play(10,true);
+		
+			}
+			var crop_width = (1-_config.n/_config.playtime)*_config.playtime_w > 0?(1-_config.n/_config.playtime)*_config.playtime_w:0;
+			playtime_progress.crop({x:0,y:0,width:crop_width,height:playtime_progress.height},false);
+		
+			if(_config.n >= _config.playtime){
+				game_music.pause();
+				var over_music = new Media(over_music_src,
+					// success callback
+					function () {
+						over_music.release();
+					},
+					// error callback
+					function (err) {
+						console.log("Audio Error: " + JSON.stringify(err));
+					}
+				);
+				over_music.play();
+				timeover.visible = true;
+				mouseloop.timer.stop();
+				//(window.console)&&console.log(_config.m);//总共落下多少金币
+				if(gametime){
+					overtxt.visible = true;
+					var overtxt_tween = game.add.tween(overtxt).to({alpha:1},1500,Phaser.Easing.Linear.None,false,500,0);
+					overtxt_tween.onComplete.addOnce(function(t){
+						$.ajax({
+							url: "data/game.json",
+							data: {},
+							type: "get",
+							dataType: "json",
+							success: function(obj) {
+								if (obj.status == 200) {
+			
+								}
+							},
+							error: function(ajaxobj) {
+			
+							}
+						})
+					},this);
+					overtxt_tween.start();
+				}else{
+					training_replay.visible = true;
+					training_exit.visible = true;
+					training_replay.alpha = 1;
+					training_exit.alpha = 1;
+				}
+			}
+		}
+		
+		function reconfig(){
+			_config.n = 0;
+		}
+		
+		//点击金币回调
+		function kill(sprite) {
+			//金币动画停止
+			sprite.animations.stop(true, true);
+		
+			//添加爆炸效果
+			var explosion = explosions.getFirstExists(false);
+			explosion.reset(sprite.x, sprite.y+20);
+			explosion.scale.set(2);
+			sprite.kill();
+			explosion.animations.currentAnim.onComplete.addOnce(function(anim){
+				//sprite.kill();
+			},this);
+			//开始爆炸
+			explosion.play('kaboom', 30, false, true);
+			
+			
+			var bom_music = new Media(bom_music_src,
+				// success callback
+				function () {
+					bom_music.release();
+				},
+				// error callback
+				function (err) {
+					console.log("Audio Error: " + JSON.stringify(err));
+				}
+			);
+			bom_music.play();
+			
+			//得分
+			killtxt_n.text = _config.killtxt+=1;
+			_config.storage.saveValue("kill_num",_config.killtxt);
+			if(!!sprite.name){
+				var get_n = game.add.text(sprite.x, sprite.y, '+'+sprite.name, {font: "30px GrilledCheeseBTNToasted",fill: "yellow",align: "center"});
+				get_n.anchor.set(.5,.5);
+				get_n.setShadow(2, 2, "#0C1829");
+				var s = game.add.tween(get_n.scale);
+				s.to({x: 3, y:3}, 200, Phaser.Easing.Linear.None,false,0,0,true);
+				s.onComplete.addOnce(function(t){
+					var get_n_tween = game.add.tween(get_n).to({x:moneytxt_n.x,y:moneytxt_n.y+20,alpha: 0},500,Phaser.Easing.Linear.None,false,0,0);
+					get_n_tween.onComplete.addOnce(function(t){
+						var currentMoney = _config.moneytxt += parseInt(sprite.name);
+						moneytxt_n.text = currentMoney;
+						_config.storageArray.push(sprite.name);
+						_config.storage.saveValue("money_num",currentMoney);
+						_config.storage.saveValue("moneyArray",_config.storageArray);
+					},this);
+					get_n_tween.start();
+		
+				}, this);
+				s.start();
+				gametime&&$.ajax({
+					url: "data/game.json",
+					data: {},
+					type: "get",
+					dataType: "json",
+					success: function(obj) {
+						if (obj.status == 200) {
+		
+						}
+					},
+					error: function(ajaxobj) {
+		
+					}
+				})
+			}
+		
+		}
+		
+		function setupInvader (invader){
+			invader.anchor.x = 0.5;
+			invader.anchor.y = 0.5;
+			invader.animations.add('kaboom');
+		}
+		
+		function update(){
+			
+		}
+		
+		function render(){
+			
+		}
+
+	}
+	
+});
+</script>
+</body>
+</html>

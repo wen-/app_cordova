@@ -1,0 +1,15 @@
+*{
+	margin:0;
+	padding:0;
+}
+html,body,.susliks {
+    height:100%;
+	width:100%;
+	overflow:hidden;
+}
+@font-face {
+    font-family: 'GrilledCheeseBTNToasted';
+    src: local('GrilledCheeseBTNToasted'), url('../fonts/GrilledCheeseBTNToasted.woff') format('woff');
+    font-style: normal;
+    font-weight: normal;
+}
